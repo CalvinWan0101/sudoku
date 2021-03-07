@@ -1,29 +1,3 @@
-+++
-author = "Calvin"
-title = "SUDOKU WITH C++"
-date = "2020-06-28"
-description = "使用 C++ 解決數獨問題"
-tags = ["Algorithm","Code"]
-categories = ["演算法","程式"]
-aliases = ["migrate-from-jekyl"]
-images  = ["img/photo/p4.jpg"]
-+++
-
-ㅤㅤ
-
-## 前情提要
-
-有一天我去看了上清大資工同學的備審
-
-獎項跟參賽記錄多到哭出來啊，是完全無法觸及的級別
-
-但是他有提到他有用Excel寫一個2*2的數獨
-
-剛好我最近在讀關於dfs的東西，想說不然來玩玩看
-
-邏輯應該差不多，就是比較不那麼暴力的窮舉
-
-### 正式開始
 先建立一個全域的int陣列當做map
 
 `int map[9][9]`
