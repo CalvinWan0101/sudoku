@@ -1,6 +1,10 @@
 #include <iostream>
 using namespace std;
 int sudoku[9][9];
+//當count傳入時計算x,y
+//並分別從垂直,水平,以及小格子內搜尋並判斷當前數字是否符合要求
+//一旦發現不符合就return false
+//如果都沒有發現就return true
 bool Test(int count)
 {
 
