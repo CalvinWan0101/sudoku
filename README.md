@@ -1,8 +1,20 @@
-## 🍱使用C++解開數獨(DFS)
++++
+author = "Calvin"
+title = "SUDOKU(C++)"
+date = "2020-06-28"
+tags = ["Algorithm","Code"]
+categories = ["程式"]
++++
 
+最近去看了上清大資工同學的備審，獎項跟參賽記錄多到哭出來啊，是完全無法觸及的級別。
+但是他有提到他有用Excel寫一個2*2的數獨，剛好我最近在讀關於dfs的東西，想說不然來玩玩看。
+雖然應該不算是嚴格定義下的dfs，但拿來解簡單的數獨應該是沒有太大的問題。
+<!--more-->
 先建立一個全域的int陣列當做map
 
-`int map[9][9]`
+```c++
+int sudoku[9][9]
+```
 
 然後建立一個用來檢測輸入的數字是否符合條件的函數
 
@@ -14,11 +26,7 @@ x相同的9個格子|格子內的數字互不相等|數字為1~9
 y相同的9個格子|格子內的數字互不相等|數字為1~9
 劃分在同一個小格子的9個格子|格子內的數字互不相等|數字為1~9
 
-這邊的`count`是跑到第count格的意思
-
-從第1格開始跑，到第(9*9)格結束
-
-先計算當前count值下的坐標
+這邊的`count`是跑到第count格的意思,從第1格開始跑，到第80格結束,先計算當前count值下的坐標
 
 ```c++
 int y = count / 9;
@@ -26,32 +34,30 @@ int x = count % 9;
 ```
 檢查y相同的狀況，
 ```c++
-for (int i = 0; i < 9; ++i)
-	//當發現y相同時有點的值和代入的值相同時就return false
-    if (map[y][i] == map[y][x] && i != x)
-		return false;
+	//垂直檢查
+	for (int i = 0; i < 9; ++i)
+		if (sudoku[i][x] == sudoku[y][x] && i != y)
+			return false;
 ```
 檢查x相同的狀況
 ```c++
-for (int i = 0; i < 9; ++i)
-//當發現x相同時有點的值和代入的值相同時就return false
-	if (map[i][x] == map[y][x] && i != y)
-		return false;
+//水平檢查
+	for (int i = 0; i < 9; ++i)
+		if (sudoku[y][i] == sudoku[y][x] && i != x)
+			return false;
 ```
 檢查同一小格的狀況
 ```c++
-//sx,sy指小格子的坐標
-//x,y的範圍是0~8,至於公式可以自己拿紙筆推推看
-int sy = y / 3 * 3;
-int sx = x / 3 * 3;
-for (int i = sy; i < sy + 3; ++i)
-	for (int k = sx; k < sx + 3; ++k)
-		if (map[i][k] == map[y][x] && i != y && k != x)
-			return false;
+	//小格檢查
+	//小格左上角那一格的x,y坐標為sx,sy
+	int sy = y / 3 * 3;
+	int sx = x / 3 * 3;
+	for (int i = sy; i < sy + 3; ++i)
+		for (int k = sx; k < sx + 3; ++k)
+			if (sudoku[i][k] == sudoku[y][x] && i != y && k != x)
+				return false;
 ```
-當到了這邊就代表前面都沒有return也就是這個值是沒問題的
-
-這時候就`return true;`
+當到達這邊就代表前面都沒有return也就是這個值是沒問題的,這時候就`return true;`
 
 # 
 完整的`Test`函數長這樣
@@ -60,48 +66,41 @@ bool Test(int count)
 {
 	int y = count / 9;
 	int x = count % 9;
-	//y相同
+	//水平檢查
 	for (int i = 0; i < 9; ++i)
-		if (map[y][i] == map[y][x] && i != x)
+		if (sudoku[y][i] == sudoku[y][x] && i != x)
 			return false;
-	//x相同
+	//垂直檢查
 	for (int i = 0; i < 9; ++i)
-		if (map[i][x] == map[y][x] && i != y)
+		if (sudoku[i][x] == sudoku[y][x] && i != y)
 			return false;
-	//同一小格
+	//小格檢查
+	//小格左上角那一格的x,y坐標為sx,sy
 	int sy = y / 3 * 3;
 	int sx = x / 3 * 3;
 	for (int i = sy; i < sy + 3; ++i)
 		for (int k = sx; k < sx + 3; ++k)
-			if (map[i][k] == map[y][x] && i != y && k != x)
+			if (sudoku[i][k] == sudoku[y][x] && i != y && k != x)
 				return false;
+	//default
 	return true;
 }
 ```
 
-然後是BackTracking的部分了(我這樣玩好像有dfs的味道，但我不確定是不是dfs)
-
-我把這個函數取名叫`guess`
-
-第一步先判斷是不是走到終點了
-
-也就是count的值是否為81
+然後是DFS的部分了,我把這個函數取名叫`guess`,第一步先判斷是不是走到終點了,也就是count的值是否為81
 ```c++
 if (count == 81)
-	//如果是81就把map整個印出來再return
-    {
+	{
 		for (int i = 0; i < 9; ++i)
 		{
 			for (int j = 0; j < 9; ++j)
-				cout << map[i][j] << " ";
+				cout << sudoku[i][j] << " ";
 			cout << endl;
 		}
 		return;
 	}
 ```
-確定了現在走的點不是最後一個點之後
-
-這裡一樣要計算count當下x,y的值
+確定了現在走的點不是最後一個點之後,這裡一樣要計算count當下x,y的值
 ```c++
 int y = count / 9;
 int x = count % 9;
@@ -113,24 +112,24 @@ int x = count % 9;
 當前位置沒有數字(map[y][x]==0)|開始在這一格做嘗試
 當前位置已有數字(map[y][x]!=0)|直接呼叫下一層
 
-這邊好像就比較有dfs的味道了
-
-一個值試過之後當前格再重置為0繼續試下一個值
+這邊好像就比較有dfs的味道了，一個值試過之後當前格再重置為0繼續試下一個值。
 
 當前位置沒有數字時:
 ```c++
-if (map[y][x] == 0)
+if (sudoku[y][x] == 0)
 	{
 		for (int i = 1; i <= 9; ++i)
 		{
-			//給值標記已經使用過
-			map[y][x] = i;
-			//當檢測合格的時候就再進到下一層
-            if (Test(count))
+			//給這一格一個值,同時該格非0表示該格已經使用過了
+			sudoku[y][x] = i;
+			//測試這個值放在這一格是不是符合要求(丟進Test函數進行測試)
+			if (Test(count))
+			//通過的話就進入下一格
 				guess(count + 1);
 		}
-		//重置該點數值
-		map[y][x] = 0;
+		//9個數字都嘗試完了可是不符合
+		//重置該點數值為0讓他回到上一層
+		sudoku[y][x] = 0;
 	}
 ```
 當前位置有數字時：
@@ -143,37 +142,41 @@ else
 ```c++
 void guess(int count)
 {
+	//因為格子最後一號只有到80,當count==81時表示已經把一個答案跑出來了
+	//此刻直接印出
 	if (count == 81)
 	{
 		for (int i = 0; i < 9; ++i)
 		{
 			for (int j = 0; j < 9; ++j)
-				cout << map[i][j] << " ";
+				cout << sudoku[i][j] << " ";
 			cout << endl;
 		}
 		return;
 	}
 	int y = count / 9;
 	int x = count % 9;
-	if (map[y][x] == 0)
+	if (sudoku[y][x] == 0)
 	{
 		for (int i = 1; i <= 9; ++i)
 		{
-			//給值標記已經使用過
-			map[y][x] = i;
+			//給這一格一個值,同時該格非0表示該格已經使用過了
+			sudoku[y][x] = i;
+			//測試這個值放在這一格是不是符合要求(丟進Test函數進行測試)
 			if (Test(count))
+			//通過的話就進入下一格
 				guess(count + 1);
 		}
-		//重置該點數值
-		map[y][x] = 0;
+		//9個數字都嘗試完了可是不符合
+		//重置該點數值為0讓他回到上一層
+		sudoku[y][x] = 0;
 	}
+	//這一格有數字
 	else
 		guess(count + 1);
 }
 ```
-最後一步就是main函數啦~
-
-就只有輸入map的值然後guess(0)
+最後一步就是main函數啦~就只有輸入map的值然後`guess(0)`(第一格數字為0)
 
 ### 注意這邊輸入格式空格以0代替
 ```c++
@@ -181,69 +184,82 @@ int main()
 {
 	for (int i = 0; i < 9; ++i)
 		for (int j = 0; j < 9; ++j)
-			cin >> map[i][j];
+			cin >> sudoku[i][j];
 	cout << endl;
+	//第一格是0號，count代0進入開始跑
 	guess(0);
+	system("PAUSE");
 	return 0;
 }
 ```
-我是在圖書館把這一串給寫完的
-
-寫完之後我就坐在那邊開外掛完了半小時數獨(剛好IG廣告就是數獨我嚇到)
+我是在圖書館把這一串給寫完的，寫完之後我就坐在那邊開外掛完了半小時數獨(剛好IG廣告就是數獨我嚇到)，QQ資安問題啊！！！
 
 完整的程式碼：
 ```c++
 #include <iostream>
-#include <algorithm>
 using namespace std;
-int map[9][9];
+int sudoku[9][9];
+//當count傳入時計算x,y
+//並分別從垂直,水平,以及小格子內搜尋並判斷當前數字是否符合要求
+//一旦發現不符合就return false
+//如果都沒有發現就return true
 bool Test(int count)
 {
+
 	int y = count / 9;
 	int x = count % 9;
-	//同一行
+	//水平檢查
 	for (int i = 0; i < 9; ++i)
-		if (map[y][i] == map[y][x] && i != x)
+		if (sudoku[y][i] == sudoku[y][x] && i != x)
 			return false;
-	//同一列
+	//垂直檢查
 	for (int i = 0; i < 9; ++i)
-		if (map[i][x] == map[y][x] && i != y)
+		if (sudoku[i][x] == sudoku[y][x] && i != y)
 			return false;
-	//同一小格
+	//小格檢查
+	//小格左上角那一格的x,y坐標為sx,sy
 	int sy = y / 3 * 3;
 	int sx = x / 3 * 3;
 	for (int i = sy; i < sy + 3; ++i)
 		for (int k = sx; k < sx + 3; ++k)
-			if (map[i][k] == map[y][x] && i != y && k != x)
+			if (sudoku[i][k] == sudoku[y][x] && i != y && k != x)
 				return false;
+	//default
 	return true;
 }
+//count是格子的編號,從左上角開始左往右數,0號到80號
 void guess(int count)
 {
+	//因為格子最後一號只有到80,當count==81時表示已經把一個答案跑出來了
+	//此刻直接印出
 	if (count == 81)
 	{
 		for (int i = 0; i < 9; ++i)
 		{
 			for (int j = 0; j < 9; ++j)
-				cout << map[i][j] << " ";
+				cout << sudoku[i][j] << " ";
 			cout << endl;
 		}
 		return;
 	}
 	int y = count / 9;
 	int x = count % 9;
-	if (map[y][x] == 0)
+	if (sudoku[y][x] == 0)
 	{
 		for (int i = 1; i <= 9; ++i)
 		{
-			//給值標記已經使用過
-			map[y][x] = i;
+			//給這一格一個值,同時該格非0表示該格已經使用過了
+			sudoku[y][x] = i;
+			//測試這個值放在這一格是不是符合要求(丟進Test函數進行測試)
 			if (Test(count))
+			//通過的話就進入下一格
 				guess(count + 1);
 		}
-		//重置該點數值
-		map[y][x] = 0;
+		//9個數字都嘗試完了可是不符合
+		//重置該點數值為0讓他回到上一層
+		sudoku[y][x] = 0;
 	}
+	//這一格有數字
 	else
 		guess(count + 1);
 }
@@ -251,9 +267,11 @@ int main()
 {
 	for (int i = 0; i < 9; ++i)
 		for (int j = 0; j < 9; ++j)
-			cin >> map[i][j];
+			cin >> sudoku[i][j];
 	cout << endl;
+	//第一格是0號，count代0進入開始跑
 	guess(0);
+	system("PAUSE");
 	return 0;
 }
 ```
